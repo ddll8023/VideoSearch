@@ -162,6 +162,9 @@ export const useSearchStore = defineStore("search", () => {
 			videos,
 			pagination,
 			total_count,
+			original_count = 0,
+			filtered_count = 0,
+			display_count = 0,
 			replace = false,
 		} = siteData;
 		if (videos && videos.length > 0) {
@@ -216,6 +219,31 @@ export const useSearchStore = defineStore("search", () => {
 				};
 			}
 
+			// 设置统计信息
+			if (original_count > 0 || filtered_count > 0 || display_count > 0) {
+				if (!tabStatistics.value[site_name]) {
+					tabStatistics.value[site_name] = {
+						original_count: 0,
+						filtered_count: 0,
+						display_count: 0,
+					};
+				}
+
+				if (replace) {
+					// 替换模式：直接设置新的统计数据
+					tabStatistics.value[site_name] = {
+						original_count: original_count,
+						filtered_count: filtered_count,
+						display_count: display_count,
+					};
+				} else {
+					// 追加模式：累加统计数据
+					tabStatistics.value[site_name].original_count += original_count;
+					tabStatistics.value[site_name].filtered_count += filtered_count;
+					tabStatistics.value[site_name].display_count += display_count;
+				}
+			}
+
 			// 如果还没有活跃标签页，设置为第一个有结果的平台
 			if (!activeTab.value) {
 				activeTab.value = site_name;
@@ -252,6 +280,12 @@ export const useSearchStore = defineStore("search", () => {
 			tabPagination.value = newPagination;
 		}
 
+		if (tabStatistics.value[tabName]) {
+			const newStatistics = { ...tabStatistics.value };
+			delete newStatistics[tabName];
+			tabStatistics.value = newStatistics;
+		}
+
 		console.log(`已清除tab数据: ${tabName}`);
 	};
 
@@ -263,6 +297,7 @@ export const useSearchStore = defineStore("search", () => {
 				searchResults: searchResults.value,
 				activeTab: activeTab.value,
 				tabPagination: tabPagination.value,
+				tabStatistics: tabStatistics.value,
 				siteIdMapping: siteIdMapping.value,
 				timestamp: Date.now(),
 			};
@@ -292,6 +327,7 @@ export const useSearchStore = defineStore("search", () => {
 			if (state.searchResults) searchResults.value = state.searchResults;
 			if (state.activeTab) activeTab.value = state.activeTab;
 			if (state.tabPagination) tabPagination.value = state.tabPagination;
+			if (state.tabStatistics) tabStatistics.value = state.tabStatistics;
 			if (state.siteIdMapping) siteIdMapping.value = state.siteIdMapping;
 
 			console.log("已从本地存储恢复搜索状态");
@@ -314,7 +350,7 @@ export const useSearchStore = defineStore("search", () => {
 
 	// 自动保存关键状态变化到本地存储
 	watch(
-		[searchKeyword, searchResults, activeTab, tabPagination],
+		[searchKeyword, searchResults, activeTab, tabPagination, tabStatistics],
 		() => {
 			// 只有当有搜索结果时才保存
 			if (searchKeyword.value && Object.keys(searchResults.value).length > 0) {
@@ -341,6 +377,7 @@ export const useSearchStore = defineStore("search", () => {
 		availableTabs,
 		currentTabResults,
 		currentTabPagination,
+		currentTabStatistics,
 
 		// 动作
 		setSearchKeyword,

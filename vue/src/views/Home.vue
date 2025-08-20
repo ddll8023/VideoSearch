@@ -7,6 +7,7 @@ import CommonSearch from '@/components/common/CommonSearch.vue'
 import VideoCard from '@/components/video/VideoCard.vue'
 import CommonTab from '@/components/common/CommonTab.vue'
 import CommonPagination from '@/components/common/CommonPagination.vue'
+import CommonCard from '@/components/common/CommonCard.vue'
 
 const searchStore = useSearchStore()
 const resourceStore = useResourceStore()
@@ -84,7 +85,10 @@ const processSiteSearchResult = (site, result) => {
             site_name: result.site_name || site.name,
             videos: result.videos,
             pagination: result.pagination,
-            total_count: result.total_count
+            total_count: result.total_count,
+            original_count: result.original_count || 0,
+            filtered_count: result.filtered_count || 0,
+            display_count: result.display_count || 0
         })
         return { success: true, videoCount: result.videos.length }
     }
@@ -167,7 +171,10 @@ const reloadTabData = async (tabId, keyword) => {
             site_name: result.site_name || tabId,
             videos: result.videos,
             pagination: result.pagination,
-            total_count: result.total_count
+            total_count: result.total_count,
+            original_count: result.original_count || 0,
+            filtered_count: result.filtered_count || 0,
+            display_count: result.display_count || 0
         })
         console.log(`tab ${tabId} 数据重新加载完成`)
     } else {
@@ -193,6 +200,9 @@ const loadPageData = async (keyword, currentTab, currentPage) => {
             videos: result.videos,
             pagination: result.pagination,
             total_count: result.pagination.total_count, // 确保总数量不丢失
+            original_count: result.original_count || 0,
+            filtered_count: result.filtered_count || 0,
+            display_count: result.display_count || 0,
             replace: true // 标记为替换模式，不是追加模式
         })
 
@@ -378,6 +388,26 @@ onUnmounted(() => {
                     <!-- 分页加载提示 -->
                     <div v-if="searchStore.isPaginating" class="paginating-hint">
                         <p>正在加载第 {{ paginatingPage }} 页数据...</p>
+                    </div>
+
+                    <!-- 数据统计信息 -->
+                    <div v-if="searchStore.currentTabStatistics.original_count > 0" class="statistics-container">
+                        <CommonCard>
+                            <div class="statistics-content">
+                                <div class="statistics-title">数据统计</div>
+                                <div class="statistics-details">
+                                    <span class="statistics-item">
+                                        原始数据：<strong>{{ searchStore.currentTabStatistics.original_count }}</strong> 条
+                                    </span>
+                                    <span class="statistics-item">
+                                        过滤后：<strong>{{ searchStore.currentTabStatistics.display_count }}</strong> 条
+                                    </span>
+                                    <span class="statistics-item">
+                                        已过滤：<strong>{{ searchStore.currentTabStatistics.filtered_count }}</strong> 条
+                                    </span>
+                                </div>
+                            </div>
+                        </CommonCard>
                     </div>
 
                     <!-- 横向滚动视频列表 -->
@@ -639,6 +669,45 @@ onUnmounted(() => {
         margin: 0;
         color: var(--text-secondary);
         font-size: var(--font-size-small);
+    }
+}
+
+.statistics-container {
+    margin-bottom: var(--spacing-base);
+    padding: 0 var(--spacing-base);
+}
+
+.statistics-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-small);
+}
+
+.statistics-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-small);
+}
+
+.statistics-details {
+    display: flex;
+    gap: var(--spacing-large);
+    flex-wrap: wrap;
+
+    @include respond-to(sm) {
+        flex-direction: column;
+        gap: var(--spacing-small);
+    }
+}
+
+.statistics-item {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+
+    strong {
+        color: var(--text-primary);
+        font-weight: var(--font-weight-medium);
     }
 }
 
