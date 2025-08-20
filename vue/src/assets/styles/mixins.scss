@@ -1,0 +1,245 @@
+@use "sass:math";
+
+// 响应式断点混入（使用CSS变量确保与variables.scss一致）
+@mixin respond-to($breakpoint) {
+    @if $breakpoint ==xs {
+        @media (max-width: calc(var(--breakpoint-xs) - 1px)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==sm {
+        @media (max-width: calc(var(--breakpoint-sm) - 1px)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==md {
+        @media (max-width: calc(var(--breakpoint-md) - 1px)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==lg {
+        @media (max-width: calc(var(--breakpoint-lg) - 1px)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==xl {
+        @media (max-width: calc(var(--breakpoint-xl) - 1px)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==2xl {
+        @media (max-width: calc(var(--breakpoint-2xl) - 1px)) {
+            @content;
+        }
+    }
+}
+
+// 最小宽度响应式（使用CSS变量确保与variables.scss一致）
+@mixin respond-above($breakpoint) {
+    @if $breakpoint ==xs {
+        @media (min-width: var(--breakpoint-xs)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==sm {
+        @media (min-width: var(--breakpoint-sm)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==md {
+        @media (min-width: var(--breakpoint-md)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==lg {
+        @media (min-width: var(--breakpoint-lg)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==xl {
+        @media (min-width: var(--breakpoint-xl)) {
+            @content;
+        }
+    }
+
+    @else if $breakpoint ==2xl {
+        @media (min-width: var(--breakpoint-2xl)) {
+            @content;
+        }
+    }
+}
+
+// 文本省略
+@mixin text-ellipsis($lines: 1) {
+    @if $lines ==1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @else {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: $lines;
+        overflow: hidden;
+        word-break: break-word;
+    }
+}
+
+// 清除浮动
+@mixin clearfix {
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+// 居中定位
+@mixin center-absolute {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// 水平居中定位
+@mixin center-horizontal {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+// 垂直居中定位
+@mixin center-vertical {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+// 覆盖全屏
+@mixin overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+// 隐藏滚动条
+@mixin hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+// 按钮重置
+@mixin button-reset {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+// 输入框重置
+@mixin input-reset {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    outline: none;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+// 按钮基础样式
+@mixin button-base {
+    padding: var(--spacing-small) var(--spacing-large);
+    border: none;
+    border-radius: var(--border-radius-base);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left var(--transition-base);
+    }
+
+    &:hover::before {
+        left: 100%;
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: var(--box-shadow-small);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+// 状态指示器样式变体
+@mixin status-variant($color-name) {
+    @if $color-name =='success' {
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.05));
+        color: var(--success-color);
+        border-color: rgba(5, 150, 105, 0.2);
+    }
+
+    @else if $color-name =='warning' {
+        background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
+        color: var(--warning-color);
+        border-color: rgba(217, 119, 6, 0.2);
+    }
+
+    @else if $color-name =='danger' {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+        color: var(--danger-color);
+        border-color: rgba(220, 38, 38, 0.2);
+    }
+}
+
+// 信息展示框样式
+@mixin info-box {
+    font-size: var(--font-size-mini);
+    font-family: var(--font-family-number);
+    padding: 2px var(--spacing-mini);
+    background: var(--bg-tertiary);
+    border-radius: var(--border-radius-mini);
+    border: 1px solid var(--border-light);
+}

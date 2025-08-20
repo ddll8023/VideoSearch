@@ -1,0 +1,122 @@
+:root {
+    // 主色调 - 简约蓝色
+    --primary-color: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+
+    // 功能色 - 蓝色系延伸
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --info-color: #64748b;
+
+    // 文本色
+    --text-primary: #1d2129;
+    --text-secondary: #4e5969;
+    --text-tertiary: #86909c;
+    --text-disabled: #c9cdd4;
+
+    // 背景色
+    --bg-primary: #ffffff;
+    --bg-secondary: #f2f3f5;
+    --bg-tertiary: #fafafa;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+
+    // 边框色
+    --border-color: #c9cdd4;
+    --border-light: #e5e6eb;
+    --border-dark: #86909c;
+
+    // 布局尺寸
+    --header-height: 60px; // 顶部导航栏高度
+    --sidebar-width: 200px; // 侧边栏展开宽度（用于筛选面板、导航抽屉）
+    --sidebar-collapsed-width: 64px; // 侧边栏收起宽度（仅显示图标）
+    --container-max-width: 1200px; // 内容容器最大宽度（大屏优化阅读体验）
+
+    // 字体系统
+    --font-family-base: "PingFang SC", "Helvetica Neue", Helvetica, "Microsoft YaHei", Arial, sans-serif;
+    --font-family-number: "Roboto Mono", "SF Mono", Monaco, "Cascadia Code", monospace;
+    --font-size-mini: 12px;
+    --font-size-small: 13px;
+    --font-size-base: 14px;
+    --font-size-large: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+    --font-size-3xl: 24px;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 600;
+    --line-height-base: 1.5;
+    --line-height-tight: 1.25;
+    --line-height-loose: 1.75;
+
+    // 间距系统
+    --spacing-mini: 4px;
+    --spacing-small: 8px;
+    --spacing-base: 16px;
+    --spacing-large: 20px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+    --spacing-3xl: 48px;
+
+    // 圆角系统
+    --border-radius-mini: 2px;
+    --border-radius-small: 4px;
+    --border-radius-base: 6px;
+    --border-radius-large: 8px;
+    --border-radius-xl: 12px;
+    --border-radius-full: 50%;
+
+    // 阴影系统 - 轻量级阴影效果
+    --box-shadow-none: none;
+    --box-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --box-shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --box-shadow-large: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --box-shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --box-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --box-shadow-card-hover: 0 4px 8px rgba(0, 0, 0, 0.12);
+
+    // Z-index 层级
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+
+    // 过渡动画
+    --transition-fast: 0.15s ease-in-out;
+    --transition-base: 0.25s ease-in-out;
+    --transition-slow: 0.35s ease-in-out;
+
+    // Ring 焦点环相关变量（符合WCAG 2.1可访问性标准）
+    // 用于按钮、表单元素和交互组件的焦点状态
+    --focus-ring-inset: ; // 内嵌模式标识符
+    --focus-ring-offset-width: 0px; // 焦点环偏移宽度
+    --focus-ring-offset-color: #fff; // 焦点环偏移颜色
+    --focus-ring-color: rgba(22, 93, 255, 0.2); // 焦点环主色调（主色调透明版本）
+    --focus-ring-offset-shadow: 0 0 transparent; // 焦点环偏移阴影
+    --focus-ring-shadow: 0 0 transparent; // 焦点环主阴影
+
+    // 头部导航相关变量 - 毛玻璃效果优化
+    --bg-header: rgba(255, 255, 255, 0.8);
+    --bg-header-scrolled: rgba(255, 255, 255, 0.9);
+    --border-header: rgba(22, 93, 255, 0.1);
+    --border-header-scrolled: rgba(22, 93, 255, 0.2);
+    --shadow-header: rgba(0, 0, 0, 0.08);
+
+    // 毛玻璃效果变量
+    --glass-blur-base: 12px;
+    --glass-blur-scrolled: 16px;
+    --glass-saturation: 180%;
+    --glass-brightness: 1.1;
+
+    // 响应式断点（与mixins.scss保持一致）
+    --breakpoint-xs: 480px; // 超小屏设备（智能手表、折叠屏）
+    --breakpoint-sm: 576px; // 小屏手机
+    --breakpoint-md: 768px; // 平板设备
+    --breakpoint-lg: 992px; // 小型桌面
+    --breakpoint-xl: 1200px; // 标准桌面
+    --breakpoint-2xl: 1600px; // 大屏显示器、4K屏幕
+}
