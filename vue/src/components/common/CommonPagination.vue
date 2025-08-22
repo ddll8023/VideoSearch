@@ -248,7 +248,7 @@ const handlePageInput = (event) => {
         &:hover:not(&--disabled) {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
-            color: white;
+            color: var(--text-white);
             transform: translateY(-1px);
             box-shadow: var(--box-shadow-card);
         }
@@ -267,7 +267,7 @@ const handlePageInput = (event) => {
         &--active {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
-            color: white;
+            color: var(--text-white);
 
             &:hover {
                 background-color: var(--primary-light);

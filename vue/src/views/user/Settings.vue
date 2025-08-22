@@ -280,7 +280,7 @@ onUnmounted(() => {
 
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-        color: white;
+        color: var(--text-white);
         border-color: var(--primary-color);
         box-shadow: var(--box-shadow-base);
         transform: translateY(-1px);
@@ -289,7 +289,7 @@ onUnmounted(() => {
 
 .test-all-btn {
     background: linear-gradient(135deg, var(--success-color), rgba(5, 150, 105, 0.8));
-    color: white;
+    color: var(--text-white);
     border: 1px solid var(--success-color);
     box-shadow: var(--box-shadow-small);
 
@@ -311,7 +311,7 @@ onUnmounted(() => {
 
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, var(--info-color), var(--primary-light));
-        color: white;
+        color: var(--text-white);
         border-color: var(--info-color);
         box-shadow: var(--box-shadow-base);
         transform: translateY(-1px);

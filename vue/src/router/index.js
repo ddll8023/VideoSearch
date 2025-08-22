@@ -44,8 +44,14 @@ const router = createRouter({
 		// 管理端路由
 		{
 			path: "/admin",
-			name: "adminDashboard",
-			component: () => import("../views/admin/Dashboard.vue"),
+			component: () => import("../components/admin/AdminLayout.vue"),
+			children: [
+				{
+					path: "",
+					name: "adminDashboard",
+					component: () => import("../views/admin/Dashboard.vue"),
+				},
+			],
 		},
 	],
 });

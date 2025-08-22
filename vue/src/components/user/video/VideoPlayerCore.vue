@@ -411,7 +411,7 @@ defineExpose({
         flex-direction: column;
         align-items: center;
         gap: var(--spacing-base);
-        color: white;
+        color: var(--text-white);
         text-align: center;
         z-index: 10;
 
@@ -439,7 +439,7 @@ defineExpose({
         left: 0;
         right: 0;
         background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-        color: white;
+        color: var(--text-white);
         padding: var(--spacing-large);
         display: flex;
         align-items: center;
@@ -544,7 +544,7 @@ defineExpose({
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: var(--text-white);
         text-align: center;
         z-index: 5;
 

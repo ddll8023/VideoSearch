@@ -200,7 +200,7 @@ onUnmounted(() => {
         height: 32px;
         border-radius: var(--border-radius-base);
         background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-        color: white;
+        color: var(--text-white);
         font-size: var(--font-size-large);
         box-shadow: var(--shadow-card);
     }

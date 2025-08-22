@@ -539,7 +539,7 @@ if (props.autofocus) {
     position: relative;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     border-radius: 0 var(--border-radius-xl) var(--border-radius-xl) 0;
-    color: white;
+    color: var(--text-white);
     font-weight: var(--font-weight-medium);
     overflow: hidden;
     transition: background var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);

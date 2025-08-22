@@ -155,7 +155,7 @@ const handleClick = (event) => {
     &--primary {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
-        color: white;
+        color: var(--text-white);
 
         &:hover:not(.common-button--disabled) {
             background-color: var(--primary-light);
@@ -176,7 +176,7 @@ const handleClick = (event) => {
 
             &:hover:not(.common-button--disabled) {
                 background-color: var(--primary-color);
-                color: white;
+                color: var(--text-white);
             }
         }
     }

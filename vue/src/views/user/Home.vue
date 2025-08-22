@@ -4,7 +4,7 @@ import { useSearchStore } from '@/stores/search'
 import { useResourceStore } from '@/stores/resource'
 import { searchSingleSite } from '@/services/api'
 import CommonSearch from '@/components/common/CommonSearch.vue'
-import VideoCard from '@/components/video/VideoCard.vue'
+import VideoCard from '@/components/user/video/VideoCard.vue'
 import CommonTab from '@/components/common/CommonTab.vue'
 import CommonPagination from '@/components/common/CommonPagination.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
@@ -398,15 +398,15 @@ onUnmounted(() => {
                                     <div class="statistics-details">
                                         <span class="statistics-item">
                                             原始数据：<strong>{{ searchStore.currentTabStatistics.original_count
-                                                }}</strong> 条
+                                            }}</strong> 条
                                         </span>
                                         <span class="statistics-item">
                                             过滤后：<strong>{{ searchStore.currentTabStatistics.display_count
-                                                }}</strong> 条
+                                            }}</strong> 条
                                         </span>
                                         <span class="statistics-item">
                                             已过滤：<strong>{{ searchStore.currentTabStatistics.filtered_count
-                                                }}</strong> 条
+                                            }}</strong> 条
                                         </span>
                                     </div>
                                 </div>
@@ -427,7 +427,7 @@ onUnmounted(() => {
                                     <div class="empty-page-content">
                                         <i class="fa fa-folder-open empty-page-icon"></i>
                                         <h3 class="empty-page-title">第 {{ searchStore.currentTabPagination.current_page
-                                            }} 页暂无数据</h3>
+                                        }} 页暂无数据</h3>
                                         <p class="empty-page-text">该页面暂时没有搜索结果，您可以:</p>
                                         <div class="empty-page-actions">
                                             <button v-if="searchStore.currentTabPagination.has_previous"
@@ -585,7 +585,7 @@ onUnmounted(() => {
 
 .retry-btn {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--text-white);
     padding: var(--spacing-small) var(--spacing-large);
     border: none;
     border-radius: var(--border-radius-base);
@@ -808,7 +808,7 @@ onUnmounted(() => {
 
     &.primary {
         background-color: var(--primary-color);
-        color: white;
+        color: var(--text-white);
 
         &:hover {
             background-color: var(--primary-dark);

@@ -77,7 +77,7 @@ import AppHeader from '@/components/user/AppHeader.vue'
 
 .back-home-btn {
     background: var(--primary-color);
-    color: white;
+    color: var(--text-white);
     border: none;
     padding: var(--spacing-base) var(--spacing-xl);
     border-radius: var(--border-radius-base);

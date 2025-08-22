@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useVideoStore } from '@/stores/video'
-import VideoPlayerCore from '@/components/video/VideoPlayerCore.vue'
+import VideoPlayerCore from '@/components/user/video/VideoPlayerCore.vue'
 import CommonButton from '@/components/common/CommonButton.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
 import AppHeader from '@/components/user/AppHeader.vue'
