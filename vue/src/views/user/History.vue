@@ -1,18 +1,24 @@
 <script setup>
+import AppHeader from '@/components/user/AppHeader.vue'
 // 未开发页面，无需导入任何功能模块
 </script>
 
 <template>
-    <div class="history-page">
-        <!-- 未开发状态 -->
-        <div class="under-development">
-            <div class="development-icon">🚧</div>
-            <h1>历史记录</h1>
-            <h2>功能开发中</h2>
-            <p>此功能正在开发中，敬请期待</p>
-            <button @click="$router.push({ name: 'home' })" class="back-home-btn">
-                返回主页
-            </button>
+    <div class="app-layout">
+        <!-- 应用头部 -->
+        <AppHeader />
+
+        <div class="history-page">
+            <!-- 未开发状态 -->
+            <div class="under-development">
+                <div class="development-icon">🚧</div>
+                <h1>历史记录</h1>
+                <h2>功能开发中</h2>
+                <p>此功能正在开发中，敬请期待</p>
+                <button @click="$router.push({ name: 'home' })" class="back-home-btn">
+                    返回主页
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -20,10 +26,17 @@
 <style scoped lang="scss">
 @use "@/assets/styles/index.scss" as *;
 
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .history-page {
-    min-height: calc(100vh - var(--header-height));
+    flex: 1;
     background-color: var(--bg-tertiary);
     padding: var(--spacing-xl) 0;
+    padding-top: calc(var(--spacing-xl) + var(--header-height));
 }
 
 .under-development {

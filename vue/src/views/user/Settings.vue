@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useResourceStore } from '@/stores/resource'
 import CommonSwitch from '@/components/common/CommonSwitch.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
+import AppHeader from '@/components/user/AppHeader.vue'
 
 const resourceStore = useResourceStore()
 const saveMessage = ref('')
@@ -92,115 +93,123 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="settings-page">
-        <div class="container">
-            <div class="page-header">
-                <h1>设置</h1>
-                <div class="actions">
-                    <button @click="handleTestAllSites" class="test-all-btn"
-                        :disabled="resourceStore.isLoading || resourceStore.isBatchTesting || resourceStore.stats.enabled === 0">
-                        {{ resourceStore.isBatchTesting ? '测试中...' : '测试所有连接' }}
-                    </button>
-                    <button @click="handleRefresh" class="refresh-btn" :disabled="resourceStore.isLoading">
-                        刷新站点
-                    </button>
-                </div>
-            </div>
+    <div class="app-layout">
+        <!-- 应用头部 -->
+        <AppHeader />
 
-            <!-- 消息提示 -->
-            <div v-if="saveMessage" :class="['message', `message--${saveMessage.type || 'success'}`]">
-                {{ saveMessage.text }}
-            </div>
-
-            <!-- 错误提示 -->
-            <div v-if="resourceStore.error" class="message message--error">
-                {{ resourceStore.error }}
-                <button @click="resourceStore.clearError" class="message-close">×</button>
-            </div>
-
-            <!-- 资源站点设置 -->
-            <div class="settings-section">
-                <div class="section-header">
-                    <h2>资源站点配置</h2>
-                    <p>管理视频资源站点，启用或禁用特定站点</p>
-                    <div class="stats">
-                        <span class="stat-item">
-                            总计: {{ resourceStore.stats.total }}
-                        </span>
-                        <span class="stat-item stat-enabled">
-                            已启用: {{ resourceStore.stats.enabled }}
-                        </span>
-                        <span class="stat-item stat-disabled">
-                            已禁用: {{ resourceStore.stats.disabled }}
-                        </span>
+        <div class="settings-page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>设置</h1>
+                    <div class="actions">
+                        <button @click="handleTestAllSites" class="test-all-btn"
+                            :disabled="resourceStore.isLoading || resourceStore.isBatchTesting || resourceStore.stats.enabled === 0">
+                            {{ resourceStore.isBatchTesting ? '测试中...' : '测试所有连接' }}
+                        </button>
+                        <button @click="handleRefresh" class="refresh-btn" :disabled="resourceStore.isLoading">
+                            刷新站点
+                        </button>
                     </div>
                 </div>
 
-                <div v-if="resourceStore.isLoading" class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p>加载中...</p>
+                <!-- 消息提示 -->
+                <div v-if="saveMessage" :class="['message', `message--${saveMessage.type || 'success'}`]">
+                    {{ saveMessage.text }}
                 </div>
 
-                <div v-else-if="resourceStore.sites.length === 0" class="empty-state">
-                    <p>暂无资源站点配置</p>
-                    <button @click="handleRefresh" class="refresh-btn">重新加载</button>
+                <!-- 错误提示 -->
+                <div v-if="resourceStore.error" class="message message--error">
+                    {{ resourceStore.error }}
+                    <button @click="resourceStore.clearError" class="message-close">×</button>
                 </div>
 
-                <div v-else class="site-grid-container">
-                    <div class="site-grid">
-                        <CommonCard v-for="site in resourceStore.sites" :key="site.site_id">
+                <!-- 资源站点设置 -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h2>资源站点配置</h2>
+                        <p>管理视频资源站点，启用或禁用特定站点</p>
+                        <div class="stats">
+                            <span class="stat-item">
+                                总计: {{ resourceStore.stats.total }}
+                            </span>
+                            <span class="stat-item stat-enabled">
+                                已启用: {{ resourceStore.stats.enabled }}
+                            </span>
+                            <span class="stat-item stat-disabled">
+                                已禁用: {{ resourceStore.stats.disabled }}
+                            </span>
+                        </div>
+                    </div>
 
-                            <!-- 站点名称 - Header -->
-                            <template #header>
-                                <div class="site-card-header">
-                                    <h3 class="site-name">{{ site.name }}</h3>
-                                    <span :class="['site-status', site.enabled ? 'status-enabled' : 'status-disabled']">
-                                        {{ site.enabled ? '已启用' : '已禁用' }}
-                                    </span>
-                                </div>
-                            </template>
+                    <div v-if="resourceStore.isLoading" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>加载中...</p>
+                    </div>
 
-                            <!-- 站点详情 - Body -->
-                            <div class="site-card-body">
-                                <div class="site-details">
-                                    <div class="site-detail-item">
-                                        <span class="site-detail-label">站点ID:</span>
-                                        <span class="site-id">{{ site.site_id }}</span>
+                    <div v-else-if="resourceStore.sites.length === 0" class="empty-state">
+                        <p>暂无资源站点配置</p>
+                        <button @click="handleRefresh" class="refresh-btn">重新加载</button>
+                    </div>
+
+                    <div v-else class="site-grid-container">
+                        <div class="site-grid">
+                            <CommonCard v-for="site in resourceStore.sites" :key="site.site_id">
+
+                                <!-- 站点名称 - Header -->
+                                <template #header>
+                                    <div class="site-card-header">
+                                        <h3 class="site-name">{{ site.name }}</h3>
+                                        <span
+                                            :class="['site-status', site.enabled ? 'status-enabled' : 'status-disabled']">
+                                            {{ site.enabled ? '已启用' : '已禁用' }}
+                                        </span>
                                     </div>
-                                    <div class="site-detail-item">
-                                        <span class="site-detail-label">地址:</span>
-                                        <span class="site-url">{{ site.base_url }}</span>
+                                </template>
+
+                                <!-- 站点详情 - Body -->
+                                <div class="site-card-body">
+                                    <div class="site-details">
+                                        <div class="site-detail-item">
+                                            <span class="site-detail-label">站点ID:</span>
+                                            <span class="site-id">{{ site.site_id }}</span>
+                                        </div>
+                                        <div class="site-detail-item">
+                                            <span class="site-detail-label">地址:</span>
+                                            <span class="site-url">{{ site.base_url }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 测试结果 -->
+                                    <div v-if="resourceStore.getSiteTestState(site.site_id).result" class="test-result">
+                                        <span
+                                            :class="['test-text', resourceStore.getSiteTestState(site.site_id).result?.success ? 'test-success' : 'test-error']">
+                                            {{ resourceStore.getSiteTestState(site.site_id).result?.success
+                                                ? `连接正常
+                                            (${resourceStore.getSiteTestState(site.site_id).result.elapsed_ms}ms)`
+                                                : `连接失败: ${resourceStore.getSiteTestState(site.site_id).result.error ||
+                                                resourceStore.getSiteTestState(site.site_id).result.message}` }}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <!-- 测试结果 -->
-                                <div v-if="resourceStore.getSiteTestState(site.site_id).result" class="test-result">
-                                    <span
-                                        :class="['test-text', resourceStore.getSiteTestState(site.site_id).result?.success ? 'test-success' : 'test-error']">
-                                        {{ resourceStore.getSiteTestState(site.site_id).result?.success
-                                            ? `连接正常 (${resourceStore.getSiteTestState(site.site_id).result.elapsed_ms}ms)`
-                                            : `连接失败: ${resourceStore.getSiteTestState(site.site_id).result.error ||
-                                            resourceStore.getSiteTestState(site.site_id).result.message}` }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- 操作按钮 - Footer -->
-                            <template #footer>
-                                <div class="site-actions">
-                                    <div class="action-group">
-                                        <span class="action-label">启用状态:</span>
-                                        <CommonSwitch :model-value="site.enabled"
-                                            @update:model-value="handleToggleSite(site.site_id)" size="base" />
+                                <!-- 操作按钮 - Footer -->
+                                <template #footer>
+                                    <div class="site-actions">
+                                        <div class="action-group">
+                                            <span class="action-label">启用状态:</span>
+                                            <CommonSwitch :model-value="site.enabled"
+                                                @update:model-value="handleToggleSite(site.site_id)" size="base" />
+                                        </div>
+                                        <button @click="handleTestSite(site.site_id)"
+                                            :disabled="resourceStore.getSiteTestState(site.site_id).testing"
+                                            class="test-btn">
+                                            {{ resourceStore.getSiteTestState(site.site_id).testing ? '测试中...' : '测试连接'
+                                            }}
+                                        </button>
                                     </div>
-                                    <button @click="handleTestSite(site.site_id)"
-                                        :disabled="resourceStore.getSiteTestState(site.site_id).testing"
-                                        class="test-btn">
-                                        {{ resourceStore.getSiteTestState(site.site_id).testing ? '测试中...' : '测试连接' }}
-                                    </button>
-                                </div>
-                            </template>
-                        </CommonCard>
+                                </template>
+                            </CommonCard>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -211,10 +220,17 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use "@/assets/styles/index.scss" as *;
 
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .settings-page {
-    min-height: calc(100vh - var(--header-height));
+    flex: 1;
     background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
     padding: var(--spacing-2xl) var(--spacing-base);
+    padding-top: calc(var(--spacing-2xl) + var(--header-height));
 }
 
 .container {

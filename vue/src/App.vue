@@ -1,32 +1,11 @@
 <script setup>
-import AppHeader from '@/components/system/AppHeader.vue'
+// 根据路由动态加载布局
 </script>
 
 <template>
-  <div class="app-layout">
-    <AppHeader />
-
-    <!-- 主内容区域 -->
-    <main class="app-content">
-      <router-view />
-    </main>
-  </div>
+  <router-view />
 </template>
 
-<style scoped lang="scss">
-@use "@/assets/styles/index.scss" as *;
-
-.app-layout {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-content {
-  flex: 1;
-  overflow: auto;
-  background-color: var(--bg-secondary);
-  padding-top: var(--header-height);
-  /* 为固定的顶部导航栏预留空间 */
-}
+<style>
+/* 全局样式 */
 </style>

@@ -5,7 +5,8 @@ import { useVideoStore } from '@/stores/video'
 import VideoPlayerCore from '@/components/video/VideoPlayerCore.vue'
 import CommonButton from '@/components/common/CommonButton.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
-import BackButton from '@/components/system/BackButton.vue'
+import AppHeader from '@/components/user/AppHeader.vue'
+import BackButton from '@/components/user/BackButton.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -162,74 +163,81 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="video-player-page" :class="{ 'video-player-page--fullscreen': isFullscreen }">
-        <!-- 页面头部 -->
-        <div v-if="!isFullscreen" class="video-player-page__header">
-            <BackButton @click="handleGoBack" />
+    <div class="app-layout">
+        <!-- 应用头部 -->
+        <AppHeader />
 
-            <div v-if="videoInfo" class="video-title">
-                <h1>{{ videoInfo.title }}</h1>
-                <span v-if="videoStore.selectedEpisode" class="episode-title">
-                    {{ videoStore.selectedEpisode.name }}
-                </span>
+        <div class="video-player-page" :class="{ 'video-player-page--fullscreen': isFullscreen }">
+
+            <!-- 加载状态 -->
+            <div v-if="videoStore.isLoading" class="video-player-page__loading">
+                <div class="loading-spinner">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </div>
+                <p class="loading-text">正在加载视频...</p>
             </div>
-        </div>
 
-        <!-- 加载状态 -->
-        <div v-if="videoStore.isLoading" class="video-player-page__loading">
-            <div class="loading-spinner">
-                <i class="fa fa-spinner fa-spin"></i>
+            <!-- 错误状态 -->
+            <div v-else-if="videoStore.error" class="video-player-page__error">
+                <i class="fa fa-exclamation-triangle error-icon"></i>
+                <h3 class="error-title">加载失败</h3>
+                <p class="error-message">{{ videoStore.error }}</p>
+                <CommonButton @click="checkVideoData" variant="primary">重试</CommonButton>
             </div>
-            <p class="loading-text">正在加载视频...</p>
-        </div>
 
-        <!-- 错误状态 -->
-        <div v-else-if="videoStore.error" class="video-player-page__error">
-            <i class="fa fa-exclamation-triangle error-icon"></i>
-            <h3 class="error-title">加载失败</h3>
-            <p class="error-message">{{ videoStore.error }}</p>
-            <CommonButton @click="checkVideoData" variant="primary">重试</CommonButton>
-        </div>
+            <!-- 播放器内容 -->
+            <div v-else-if="videoStore.hasVideo && currentPlayUrl" class="video-player-page__content">
+                <!-- 返回按钮和标题区域 -->
+                <div v-if="!isFullscreen" class="video-player-page__header">
+                    <BackButton @click="handleGoBack" />
+                    <div class="header-info">
+                        <h2 class="video-title">{{ videoInfo.title }}</h2>
+                        <span v-if="videoStore.selectedEpisode?.name" class="episode-name">{{
+                            videoStore.selectedEpisode.name }}</span>
+                    </div>
+                </div>
 
-        <!-- 播放器内容 -->
-        <div v-else-if="videoStore.hasVideo && currentPlayUrl" class="video-player-page__content">
-            <!-- 主播放区域 -->
-            <div class="main-player-area">
-                <!-- 视频播放器 -->
-                <div class="player-container">
-                    <VideoPlayerCore :src="currentPlayUrl" :title="videoInfo.title"
-                        :episode="videoStore.selectedEpisode?.name || ''" @ready="handlePlayerReady"
-                        @fullscreen-change="handleFullscreenChange" class="video-player" />
+                <!-- 播放区域容器 -->
+                <div class="player-layout">
+                    <!-- 主播放区域 -->
+                    <div class="main-player-area">
+                        <!-- 视频播放器 -->
+                        <div class="player-container">
+                            <VideoPlayerCore :src="currentPlayUrl" :title="videoInfo.title"
+                                :episode="videoStore.selectedEpisode?.name || ''" @ready="handlePlayerReady"
+                                @fullscreen-change="handleFullscreenChange" class="video-player" />
+                        </div>
+                    </div>
+
+                    <!-- 右侧剧集列表 -->
+                    <div v-if="!isFullscreen && videoStore.currentEpisodes.length > 1" class="sidebar-episodes">
+                        <CommonCard class="episodes-sidebar-card">
+                            <div class="episodes-header">
+                                <h3 class="episodes-title">剧集列表</h3>
+                                <span class="episodes-count">共 {{ videoStore.currentEpisodes.length }} 集</span>
+                            </div>
+
+                            <div ref="episodesScrollRef" class="episodes-scroll-container">
+                                <div class="episodes-grid">
+                                    <CommonButton v-for="(episode, index) in videoStore.currentEpisodes" :key="index"
+                                        :type="videoStore.selectedEpisode === episode ? 'primary' : 'default'"
+                                        @click="handleEpisodeChange(episode)" class="episodes-btn">
+                                        {{ episode.name }}
+                                    </CommonButton>
+                                </div>
+                            </div>
+                        </CommonCard>
+                    </div>
                 </div>
             </div>
 
-            <!-- 右侧剧集列表 -->
-            <div v-if="!isFullscreen && videoStore.currentEpisodes.length > 1" class="sidebar-episodes">
-                <CommonCard class="episodes-sidebar-card">
-                    <div class="episodes-header">
-                        <h3 class="episodes-title">剧集列表</h3>
-                        <span class="episodes-count">共 {{ videoStore.currentEpisodes.length }} 集</span>
-                    </div>
-
-                    <div ref="episodesScrollRef" class="episodes-scroll-container">
-                        <div class="episodes-grid">
-                            <CommonButton v-for="(episode, index) in videoStore.currentEpisodes" :key="index"
-                                :type="videoStore.selectedEpisode === episode ? 'primary' : 'default'"
-                                @click="handleEpisodeChange(episode)" class="episodes-btn">
-                                {{ episode.name }}
-                            </CommonButton>
-                        </div>
-                    </div>
-                </CommonCard>
+            <!-- 无播放源状态 -->
+            <div v-else-if="videoStore.hasVideo" class="video-player-page__empty">
+                <i class="fa fa-play-circle-o empty-icon"></i>
+                <h3 class="empty-title">暂无播放源</h3>
+                <p class="empty-message">该视频暂时无法播放</p>
+                <CommonButton @click="handleGoBack" variant="outline">返回详情</CommonButton>
             </div>
-        </div>
-
-        <!-- 无播放源状态 -->
-        <div v-else-if="videoStore.hasVideo" class="video-player-page__empty">
-            <i class="fa fa-play-circle-o empty-icon"></i>
-            <h3 class="empty-title">暂无播放源</h3>
-            <p class="empty-message">该视频暂时无法播放</p>
-            <CommonButton @click="handleGoBack" variant="outline">返回详情</CommonButton>
         </div>
     </div>
 </template>
@@ -237,8 +245,14 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use "@/assets/styles/index.scss" as *;
 
-.video-player-page {
+.app-layout {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-player-page {
+    flex: 1;
     background-color: var(--bg-primary);
     display: flex;
     flex-direction: column;
@@ -253,32 +267,11 @@ onUnmounted(() => {
         background-color: #000;
     }
 
-    &__header {
-        padding: var(--spacing-base) var(--spacing-xl);
-        background-color: var(--bg-primary);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-large);
-    }
 
 
 
-    .video-title {
-        flex: 1;
 
-        h1 {
-            font-size: var(--font-size-large);
-            font-weight: var(--font-weight-medium);
-            color: var(--text-primary);
-            margin: 0;
-            line-height: var(--line-height-tight);
-        }
 
-        .episode-title {
-            font-size: var(--font-size-small);
-            color: var(--text-secondary);
-        }
-    }
 
     &__loading,
     &__error,
@@ -348,26 +341,72 @@ onUnmounted(() => {
     &__content {
         flex: 1;
         display: flex;
+        flex-direction: column;
+        position: relative;
         max-width: 90vw;
         margin: 0 auto;
         width: 100%;
         padding: var(--spacing-xl);
-        gap: var(--spacing-xl);
-
-        @include respond-to(lg) {
-            flex-direction: row;
-            align-items: flex-start;
-        }
+        padding-top: calc(var(--spacing-xl) + var(--header-height));
 
         @include respond-to(md) {
             padding: var(--spacing-base);
-            gap: var(--spacing-base);
-            flex-direction: column;
         }
+    }
 
-        @include respond-to(sm) {
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-base);
+        margin-bottom: var(--spacing-xl);
+
+        .header-info {
+            display: flex;
             flex-direction: column;
+            gap: var(--spacing-tiny);
+
+            .video-title {
+                font-size: var(--font-size-large);
+                font-weight: var(--font-weight-medium);
+                color: var(--text-primary);
+                margin: 0;
+                line-height: 1.2;
+
+                @include respond-to(md) {
+                    font-size: var(--font-size-base);
+                }
+            }
+
+            .episode-name {
+                font-size: var(--font-size-small);
+                color: var(--text-secondary);
+                font-weight: var(--font-weight-normal);
+
+                @include respond-to(md) {
+                    font-size: var(--font-size-tiny);
+                }
+            }
         }
+    }
+}
+
+// 播放区域容器
+.player-layout {
+    display: flex;
+    gap: var(--spacing-xl);
+
+    @include respond-to(lg) {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    @include respond-to(md) {
+        gap: var(--spacing-base);
+        flex-direction: column;
+    }
+
+    @include respond-to(sm) {
+        flex-direction: column;
     }
 }
 
@@ -473,18 +512,18 @@ onUnmounted(() => {
     .episodes-scroll-container {
         flex: 1;
         overflow-y: auto;
-        max-height: calc(60vh - 100px);
+        height: calc(75vh - 120px);
 
         @include respond-to(lg) {
-            max-height: calc(55vh - 100px);
+            height: calc(55vh - 120px);
         }
 
         @include respond-to(md) {
-            max-height: calc(50vh - 100px);
+            height: calc(50vh - 120px);
         }
 
         @include respond-to(sm) {
-            max-height: calc(40vh - 100px);
+            height: calc(40vh - 120px);
         }
 
         // 自定义滚动条样式

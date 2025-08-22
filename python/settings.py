@@ -62,7 +62,7 @@ class Config:
 
     # 连接测试配置
     CONNECTION_TEST_CONFIG = {
-        "test_keywords": ["电影", "电视剧", "动漫", "综艺", "纪录片"],
+        "test_keywords": ["喜羊羊", "灰太狼", "猪猪侠"],
         "response_validation": {
             "min_response_size": 100,
             "required_fields": ["code", "msg", "data"],

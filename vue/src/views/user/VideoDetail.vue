@@ -6,7 +6,8 @@ import { useSearchStore } from '@/stores/search'
 import CommonButton from '@/components/common/CommonButton.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
 import CommonTab from '@/components/common/CommonTab.vue'
-import BackButton from '@/components/system/BackButton.vue'
+import AppHeader from '@/components/user/AppHeader.vue'
+import BackButton from '@/components/user/BackButton.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -135,104 +136,114 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="video-detail">
-        <!-- 返回按钮 -->
-        <div class="video-detail__header">
-            <BackButton @click="handleGoBack" />
-        </div>
+    <div class="app-layout">
+        <!-- 应用头部 -->
+        <AppHeader />
 
-        <!-- 加载状态 -->
-        <div v-if="videoStore.isLoading" class="video-detail__loading">
-            <div class="loading-spinner">
-                <i class="fa fa-spinner fa-spin"></i>
+        <div class="video-detail">
+
+            <!-- 加载状态 -->
+            <div v-if="videoStore.isLoading" class="video-detail__loading">
+                <div class="loading-spinner">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </div>
+                <p class="loading-text">正在获取视频详情...</p>
             </div>
-            <p class="loading-text">正在获取视频详情...</p>
-        </div>
 
-        <!-- 错误状态 -->
-        <div v-else-if="videoStore.error" class="video-detail__error">
-            <i class="fa fa-exclamation-triangle error-icon"></i>
-            <h3 class="error-title">获取失败</h3>
-            <p class="error-message">{{ videoStore.error }}</p>
-            <CommonButton @click="fetchVideoDetail" variant="primary">重试</CommonButton>
-        </div>
+            <!-- 错误状态 -->
+            <div v-else-if="videoStore.error" class="video-detail__error">
+                <i class="fa fa-exclamation-triangle error-icon"></i>
+                <h3 class="error-title">获取失败</h3>
+                <p class="error-message">{{ videoStore.error }}</p>
+                <CommonButton @click="fetchVideoDetail" variant="primary">重试</CommonButton>
+            </div>
 
-        <!-- 视频详情内容 -->
-        <div v-else-if="videoStore.hasVideo" class="video-detail__content">
-
-
-            <!-- 视频信息和播放源 -->
-            <!-- 视频基本信息 -->
-            <CommonCard class="video-info-card">
-                <div class="video-info">
-                    <div class="video-info__poster">
-                        <img v-if="videoInfo.thumbnail" :src="videoInfo.thumbnail" :alt="videoInfo.title"
-                            class="poster-image" />
-                        <div v-else class="poster-placeholder">
-                            <i class="fa fa-image"></i>
-                        </div>
-                    </div>
-
-                    <div class="video-info__details">
-                        <h1 class="video-title">{{ videoInfo.title }}</h1>
-
-                        <div class="video-meta">
-                            <div v-if="videoInfo.status" class="meta-item">
-                                <span class="meta-label">状态:</span>
-                                <span class="meta-value">{{ videoInfo.status }}</span>
-                            </div>
-                            <div v-if="videoInfo.year" class="meta-item">
-                                <span class="meta-label">年份:</span>
-                                <span class="meta-value">{{ videoInfo.year }}</span>
-                            </div>
-                            <div v-if="videoInfo.area" class="meta-item">
-                                <span class="meta-label">地区:</span>
-                                <span class="meta-value">{{ videoInfo.area }}</span>
-                            </div>
-                            <div v-if="videoInfo.language" class="meta-item">
-                                <span class="meta-label">语言:</span>
-                                <span class="meta-value">{{ videoInfo.language }}</span>
-                            </div>
-                            <div v-if="videoInfo.channel" class="meta-item">
-                                <span class="meta-label">类型:</span>
-                                <span class="meta-value">{{ videoInfo.channel }}</span>
-                            </div>
-                            <div v-if="videoInfo.actor" class="meta-item">
-                                <span class="meta-label">演员:</span>
-                                <span class="meta-value">{{ videoInfo.actor }}</span>
-                            </div>
-                        </div>
-
-                        <div v-if="videoInfo.description" class="video-description">
-                            <h3 class="description-title">剧情简介</h3>
-                            <div class="description-content" v-html="videoInfo.description"></div>
-                        </div>
-                    </div>
+            <!-- 视频详情内容 -->
+            <div v-else-if="videoStore.hasVideo" class="video-detail__content">
+                <!-- 返回按钮 -->
+                <div class="video-detail__back-button">
+                    <BackButton @click="handleGoBack" />
                 </div>
-            </CommonCard>
 
-            <!-- 播放源选择 -->
-            <CommonCard v-if="videoStore.hasPlaySources" class="play-sources-card">
-                <div class="play-sources">
-                    <h3 class="sources-title">播放源</h3>
+                <!-- 视频基本信息 -->
+                <CommonCard class="video-info-card">
+                    <div class="video-info">
+                        <div class="video-info__poster">
+                            <img v-if="videoInfo.thumbnail" :src="videoInfo.thumbnail" :alt="videoInfo.title"
+                                class="poster-image" />
+                            <div v-else class="poster-placeholder">
+                                <i class="fa fa-image"></i>
+                            </div>
+                        </div>
 
-                    <!-- 播放格式选择 -->
-                    <CommonTab :tabs="playSourceTabs" :activeTab="videoStore.selectedPlaySource"
-                        @tab-change="handleTabChange" class="format-tabs" />
+                        <div class="video-info__details">
+                            <h1 class="video-title">{{ videoInfo.title }}</h1>
 
-                    <!-- 剧集列表 -->
-                    <div v-if="videoStore.currentEpisodes.length > 0" class="episodes-list">
-                        <h4 class="episodes-title">选择集数</h4>
-                        <div class="episodes-grid">
-                            <CommonButton v-for="(episode, index) in videoStore.currentEpisodes" :key="index"
-                                :type="videoStore.selectedEpisode === episode ? 'primary' : 'default'"
-                                @click="handleEpisodeChange(episode)">
-                                {{ episode.name }}
-                            </CommonButton>
+                            <div class="video-meta">
+                                <!-- 第一行：状态、年份、地区 -->
+                                <div class="meta-row">
+                                    <div v-if="videoInfo.status" class="meta-item">
+                                        <span class="meta-label">状态:</span>
+                                        <span class="meta-value">{{ videoInfo.status }}</span>
+                                    </div>
+                                    <div v-if="videoInfo.year" class="meta-item">
+                                        <span class="meta-label">年份:</span>
+                                        <span class="meta-value">{{ videoInfo.year }}</span>
+                                    </div>
+                                    <div v-if="videoInfo.area" class="meta-item">
+                                        <span class="meta-label">地区:</span>
+                                        <span class="meta-value">{{ videoInfo.area }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- 第二行：语言、类型、演员 -->
+                                <div class="meta-row">
+                                    <div v-if="videoInfo.language" class="meta-item">
+                                        <span class="meta-label">语言:</span>
+                                        <span class="meta-value">{{ videoInfo.language }}</span>
+                                    </div>
+                                    <div v-if="videoInfo.channel" class="meta-item">
+                                        <span class="meta-label">类型:</span>
+                                        <span class="meta-value">{{ videoInfo.channel }}</span>
+                                    </div>
+                                    <div v-if="videoInfo.actor" class="meta-item">
+                                        <span class="meta-label">演员:</span>
+                                        <span class="meta-value">{{ videoInfo.actor }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="videoInfo.description" class="video-description">
+                                <h3 class="description-title">剧情简介</h3>
+                                <div class="description-content" v-html="videoInfo.description"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </CommonCard>
+                </CommonCard>
+
+                <!-- 播放源选择 -->
+                <CommonCard v-if="videoStore.hasPlaySources" class="play-sources-card">
+                    <div class="play-sources">
+                        <h3 class="sources-title">播放源</h3>
+
+                        <!-- 播放格式选择 -->
+                        <CommonTab :tabs="playSourceTabs" :activeTab="videoStore.selectedPlaySource"
+                            @tab-change="handleTabChange" class="format-tabs" />
+
+                        <!-- 剧集列表 -->
+                        <div v-if="videoStore.currentEpisodes.length > 0" class="episodes-list">
+                            <h4 class="episodes-title">选择集数</h4>
+                            <div class="episodes-grid">
+                                <CommonButton v-for="(episode, index) in videoStore.currentEpisodes" :key="index"
+                                    :type="videoStore.selectedEpisode === episode ? 'primary' : 'default'"
+                                    @click="handleEpisodeChange(episode)">
+                                    {{ episode.name }}
+                                </CommonButton>
+                            </div>
+                        </div>
+                    </div>
+                </CommonCard>
+            </div>
         </div>
     </div>
 </template>
@@ -240,8 +251,14 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use "@/assets/styles/index.scss" as *;
 
-.video-detail {
+.app-layout {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-detail {
+    flex: 1;
     background-color: var(--bg-primary);
 
     &__header {
@@ -298,8 +315,13 @@ onUnmounted(() => {
 
     &__content {
         padding: var(--spacing-xl);
-        max-width: 1200px;
+        max-width: 90vw;
         margin: 0 auto;
+        padding-top: calc(var(--spacing-xl) + var(--header-height));
+    }
+
+    &__back-button {
+        margin-bottom: var(--spacing-xl);
     }
 }
 
@@ -365,14 +387,24 @@ onUnmounted(() => {
 }
 
 .video-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-base);
     margin-bottom: var(--spacing-large);
+
+    .meta-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-base);
+        margin-bottom: var(--spacing-small);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
 
     .meta-item {
         display: flex;
         gap: var(--spacing-small);
+        min-width: 0;
+        /* 允许flex item收缩 */
 
         .meta-label {
             color: var(--text-secondary);
@@ -382,6 +414,11 @@ onUnmounted(() => {
 
         .meta-value {
             color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+            /* 允许文本收缩 */
         }
     }
 }

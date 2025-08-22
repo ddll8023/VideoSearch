@@ -8,6 +8,7 @@ import VideoCard from '@/components/video/VideoCard.vue'
 import CommonTab from '@/components/common/CommonTab.vue'
 import CommonPagination from '@/components/common/CommonPagination.vue'
 import CommonCard from '@/components/common/CommonCard.vue'
+import AppHeader from '@/components/user/AppHeader.vue'
 
 const searchStore = useSearchStore()
 const resourceStore = useResourceStore()
@@ -171,10 +172,11 @@ const reloadTabData = async (tabId, keyword) => {
             site_name: result.site_name || tabId,
             videos: result.videos,
             pagination: result.pagination,
-            total_count: result.total_count,
+            total_count: result.pagination.total_count, // 确保总数量不丢失
             original_count: result.original_count || 0,
             filtered_count: result.filtered_count || 0,
-            display_count: result.display_count || 0
+            display_count: result.display_count || 0,
+            replace: true // 标记为替换模式，不是追加模式
         })
         console.log(`tab ${tabId} 数据重新加载完成`)
     } else {
@@ -346,105 +348,134 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div :class="['home-page', { 'centered': !hasSearched }]">
-        <!-- 页面标题 -->
-        <h1 :class="[
-            'home-page__title',
-            { 'home-page__title--centered': !hasSearched, 'home-page__title--compact': hasSearched }
-        ]">影视聚合搜索</h1>
+    <div class="app-layout">
+        <!-- 应用头部 -->
+        <AppHeader />
 
-        <!-- 搜索容器 -->
-        <div :class="[
-            'search-container',
-            { 'centered': !hasSearched, 'top': hasSearched }
-        ]">
-            <!-- 搜索框组件 -->
-            <CommonSearch ref="searchBoxRef" v-model="searchInput" :variant="searchVariant" placeholder="请输入要搜索的视频名称..."
-                :loading="searchStore.isSearching" :disabled="searchStore.isSearching" :autofocus="true"
-                @search="handleSearchRequest" @clear="handleClear" />
-        </div>
+        <div :class="['home-page', { 'centered': !hasSearched }]">
+            <!-- 搜索容器 -->
+            <div :class="[
+                'search-container',
+                { 'centered': !hasSearched, 'top': hasSearched }
+            ]">
+                <!-- 搜索框组件 -->
+                <CommonSearch ref="searchBoxRef" v-model="searchInput" :variant="searchVariant"
+                    placeholder="请输入要搜索的视频名称..." :loading="searchStore.isSearching" :disabled="searchStore.isSearching"
+                    :autofocus="true" @search="handleSearchRequest" @clear="handleClear" />
+            </div>
 
-        <!-- 搜索结果区域 -->
-        <div v-if="hasSearched" class="results-section">
-            <div class="results-container">
-                <!-- 错误信息 -->
-                <div v-if="searchStore.searchError && !searchStore.hasSearchResults" class="error-message">
-                    <h3 class="message-title">搜索失败</h3>
-                    <p class="message-text">{{ searchStore.searchError }}</p>
-                    <button @click="handleSearchRequest(searchStore.searchKeyword)" class="retry-btn">重试</button>
-                </div>
-
-                <!-- 搜索结果 - 有结果时优先显示，支持流式搜索实时展示 -->
-                <div v-else-if="searchStore.hasSearchResults" class="search-results">
-                    <!-- 标签页 -->
-                    <CommonTab :tabs="searchStore.availableTabs" :active-tab="searchStore.activeTab"
-                        @tab-change="handleTabChange" />
-
-                    <!-- 搜索进行中的提示 -->
-                    <div v-if="searchStore.isSearching" class="searching-hint">
-                        <p>正在搜索更多资源站点...</p>
+            <!-- 搜索结果区域 -->
+            <div v-if="hasSearched" class="results-section">
+                <div class="results-container">
+                    <!-- 错误信息 -->
+                    <div v-if="searchStore.searchError && !searchStore.hasSearchResults" class="error-message">
+                        <h3 class="message-title">搜索失败</h3>
+                        <p class="message-text">{{ searchStore.searchError }}</p>
+                        <button @click="handleSearchRequest(searchStore.searchKeyword)" class="retry-btn">重试</button>
                     </div>
 
-                    <!-- 分页加载提示 -->
-                    <div v-if="searchStore.isPaginating" class="paginating-hint">
-                        <p>正在加载第 {{ paginatingPage }} 页数据...</p>
-                    </div>
+                    <!-- 搜索结果 - 有结果时优先显示，支持流式搜索实时展示 -->
+                    <div v-else-if="searchStore.hasSearchResults" class="search-results">
+                        <!-- 标签页 -->
+                        <CommonTab :tabs="searchStore.availableTabs" :active-tab="searchStore.activeTab"
+                            @tab-change="handleTabChange" />
 
-                    <!-- 数据统计信息 -->
-                    <div v-if="searchStore.currentTabStatistics.original_count > 0" class="statistics-container">
-                        <CommonCard>
-                            <div class="statistics-content">
-                                <div class="statistics-title">数据统计</div>
-                                <div class="statistics-details">
-                                    <span class="statistics-item">
-                                        原始数据：<strong>{{ searchStore.currentTabStatistics.original_count }}</strong> 条
-                                    </span>
-                                    <span class="statistics-item">
-                                        过滤后：<strong>{{ searchStore.currentTabStatistics.display_count }}</strong> 条
-                                    </span>
-                                    <span class="statistics-item">
-                                        已过滤：<strong>{{ searchStore.currentTabStatistics.filtered_count }}</strong> 条
-                                    </span>
+                        <!-- 搜索进行中的提示 -->
+                        <div v-if="searchStore.isSearching" class="searching-hint">
+                            <p>正在搜索更多资源站点...</p>
+                        </div>
+
+                        <!-- 分页加载提示 -->
+                        <div v-if="searchStore.isPaginating" class="paginating-hint">
+                            <p>正在加载第 {{ paginatingPage }} 页数据...</p>
+                        </div>
+
+                        <!-- 数据统计信息 -->
+                        <div v-if="searchStore.currentTabStatistics.original_count > 0" class="statistics-container">
+                            <CommonCard>
+                                <div class="statistics-content">
+                                    <div class="statistics-title">数据统计</div>
+                                    <div class="statistics-details">
+                                        <span class="statistics-item">
+                                            原始数据：<strong>{{ searchStore.currentTabStatistics.original_count
+                                                }}</strong> 条
+                                        </span>
+                                        <span class="statistics-item">
+                                            过滤后：<strong>{{ searchStore.currentTabStatistics.display_count
+                                                }}</strong> 条
+                                        </span>
+                                        <span class="statistics-item">
+                                            已过滤：<strong>{{ searchStore.currentTabStatistics.filtered_count
+                                                }}</strong> 条
+                                        </span>
+                                    </div>
                                 </div>
+                            </CommonCard>
+                        </div>
+
+                        <!-- 横向滚动视频列表 -->
+                        <div class="video-grid-container">
+                            <!-- 当前页面有数据时显示视频列表 -->
+                            <div v-if="searchStore.currentPageHasData" class="video-grid">
+                                <VideoCard v-for="video in searchStore.currentTabResults"
+                                    :key="`${video.platform}-${video.id}`" :video="video" />
                             </div>
-                        </CommonCard>
+
+                            <!-- 当前页面为空时显示提示 -->
+                            <div v-else-if="searchStore.isCurrentPageEmpty" class="empty-page-state">
+                                <CommonCard>
+                                    <div class="empty-page-content">
+                                        <i class="fa fa-folder-open empty-page-icon"></i>
+                                        <h3 class="empty-page-title">第 {{ searchStore.currentTabPagination.current_page
+                                            }} 页暂无数据</h3>
+                                        <p class="empty-page-text">该页面暂时没有搜索结果，您可以:</p>
+                                        <div class="empty-page-actions">
+                                            <button v-if="searchStore.currentTabPagination.has_previous"
+                                                @click="handlePageChange({ currentPage: searchStore.currentTabPagination.previous_page })"
+                                                class="empty-page-btn primary">
+                                                <i class="fa fa-arrow-left"></i>
+                                                上一页
+                                            </button>
+                                            <button v-if="searchStore.currentTabPagination.has_next"
+                                                @click="handlePageChange({ currentPage: searchStore.currentTabPagination.next_page })"
+                                                class="empty-page-btn secondary">
+                                                <i class="fa fa-arrow-right"></i>
+                                                下一页
+                                            </button>
+                                        </div>
+                                    </div>
+                                </CommonCard>
+                            </div>
+                        </div>
+
+                        <!-- 分页组件 -->
+                        <div v-if="searchStore.currentTabPagination.total_pages > 1" class="pagination-container">
+                            <CommonPagination :current-page="searchStore.currentTabPagination.current_page"
+                                :total-pages="searchStore.currentTabPagination.total_pages"
+                                :show-input="searchStore.currentTabPagination.total_pages > 10" :size="'base'"
+                                :compact="true" :disabled="searchStore.isPaginating" @pagechange="handlePageChange" />
+                        </div>
+
+
                     </div>
 
-                    <!-- 横向滚动视频列表 -->
-                    <div class="video-grid-container">
-                        <div class="video-grid">
-                            <VideoCard v-for="video in searchStore.currentTabResults"
-                                :key="`${video.platform}-${video.id}`" :video="video" />
+                    <!-- 纯加载状态 - 仅在搜索中且无结果时显示 -->
+                    <div v-else-if="searchStore.isSearching" class="loading-state">
+                        <div class="loading-lines">
+                            <div class="loading-line"></div>
+                            <div class="loading-line"></div>
+                            <div class="loading-line"></div>
+                        </div>
+                        <div class="loading-content">
+                            <p class="loading-text">正在搜索中...</p>
                         </div>
                     </div>
 
-                    <!-- 分页组件 -->
-                    <div v-if="searchStore.currentTabPagination.total_pages > 1" class="pagination-container">
-                        <CommonPagination :current-page="searchStore.currentTabPagination.current_page"
-                            :total-pages="searchStore.currentTabPagination.total_pages"
-                            :show-input="searchStore.currentTabPagination.total_pages > 10" :size="'base'"
-                            :compact="true" :disabled="searchStore.isPaginating" @pagechange="handlePageChange" />
+                    <!-- 无结果状态 -->
+                    <div v-else class="no-results">
+                        <h3 class="message-title">没有找到相关内容</h3>
+                        <p class="message-text">请尝试其他关键词或检查拼写</p>
                     </div>
-
-
-                </div>
-
-                <!-- 纯加载状态 - 仅在搜索中且无结果时显示 -->
-                <div v-else-if="searchStore.isSearching" class="loading-state">
-                    <div class="loading-lines">
-                        <div class="loading-line"></div>
-                        <div class="loading-line"></div>
-                        <div class="loading-line"></div>
-                    </div>
-                    <div class="loading-content">
-                        <p class="loading-text">正在搜索中...</p>
-                    </div>
-                </div>
-
-                <!-- 无结果状态 -->
-                <div v-else class="no-results">
-                    <h3 class="message-title">没有找到相关内容</h3>
-                    <p class="message-text">请尝试其他关键词或检查拼写</p>
                 </div>
             </div>
         </div>
@@ -453,6 +484,12 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @use "@/assets/styles/index.scss" as *;
+
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
 .home-page {
     display: flex;
@@ -708,6 +745,102 @@ onUnmounted(() => {
     strong {
         color: var(--text-primary);
         font-weight: var(--font-weight-medium);
+    }
+}
+
+// 空数据页面样式
+.empty-page-state {
+    padding: var(--spacing-base);
+}
+
+.empty-page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    gap: var(--spacing-base);
+}
+
+.empty-page-icon {
+    font-size: 48px;
+    color: var(--text-tertiary);
+    margin-bottom: var(--spacing-base);
+}
+
+.empty-page-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.empty-page-text {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: var(--line-height-base);
+}
+
+.empty-page-actions {
+    display: flex;
+    gap: var(--spacing-base);
+    margin-top: var(--spacing-base);
+
+    @include respond-to(sm) {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+.empty-page-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: var(--spacing-small) var(--spacing-large);
+    border: none;
+    border-radius: var(--border-radius-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+
+    &.primary {
+        background-color: var(--primary-color);
+        color: white;
+
+        &:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--box-shadow-card);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.secondary {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-light);
+
+        &:hover {
+            background-color: var(--bg-tertiary);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--box-shadow-card);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    @include respond-to(sm) {
+        justify-content: center;
+        width: 100%;
     }
 }
 

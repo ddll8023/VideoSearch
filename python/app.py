@@ -65,6 +65,12 @@ def create_app():
     return app
 
 
+# 创建全局应用实例供uWSGI使用
+application = create_app()
+
+# 为Gunicorn提供标准的app实例名
+app = application
+
 if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # 开发模式直接运行
+    application.run(debug=True, host="0.0.0.0", port=5000)

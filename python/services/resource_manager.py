@@ -46,7 +46,7 @@ class ResourceManager:
         获取所有资源站信息
 
         将ResourceSiteConfig对象转换为字典格式，便于API响应和前端展示。
-        只返回必要的基础信息，不包含敏感配置。
+        返回所有站点信息（包括禁用的），前端根据enabled字段判断状态。
 
         Returns:
             资源站信息列表，每个元素包含：site_id, name, base_url, enabled, timeout

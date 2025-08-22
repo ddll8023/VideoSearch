@@ -91,6 +91,21 @@ export const useSearchStore = defineStore("search", () => {
 		return tabStatistics.value[activeTab.value];
 	});
 
+	// 当前页面是否有数据
+	const currentPageHasData = computed(() => {
+		return currentTabResults.value && currentTabResults.value.length > 0;
+	});
+
+	// 当前页面是否为空页面（有分页信息但无数据）
+	const isCurrentPageEmpty = computed(() => {
+		const pagination = currentTabPagination.value;
+		const hasResults = currentPageHasData.value;
+		// 当前页码大于1且没有数据，或者总页数大于0但当前页没有数据
+		return (
+			!hasResults && (pagination.current_page > 1 || pagination.total_pages > 0)
+		);
+	});
+
 	// 动作
 	const setSearchKeyword = (keyword) => {
 		searchKeyword.value = keyword;
@@ -167,12 +182,26 @@ export const useSearchStore = defineStore("search", () => {
 			display_count = 0,
 			replace = false,
 		} = siteData;
-		if (videos && videos.length > 0) {
-			// 记录站点ID和站点名称的映射关系
-			if (site_id && site_name) {
-				siteIdMapping.value[site_name] = site_id;
-			}
 
+		// 始终记录站点ID和站点名称的映射关系
+		if (site_id && site_name) {
+			siteIdMapping.value[site_name] = site_id;
+		}
+
+		// 始终更新分页信息
+		if (pagination) {
+			if (!tabPagination.value[site_name]) {
+				tabPagination.value[site_name] = {};
+			}
+			tabPagination.value[site_name] = {
+				...tabPagination.value[site_name],
+				...pagination,
+				total_count: total_count,
+			};
+		}
+
+		// 处理视频数据（即使为空数组也要处理）
+		if (videos !== undefined && videos !== null) {
 			// 创建新的searchResults对象来确保响应性
 			const newResults = { ...searchResults.value };
 
@@ -182,28 +211,18 @@ export const useSearchStore = defineStore("search", () => {
 			}
 
 			if (replace) {
-				// 替换模式：直接替换当前页的数据
+				// 替换模式：直接替换当前页的数据（即使是空数组）
 				newResults[site_name] = videos;
-			} else {
-				// 追加模式：添加新的视频到对应平台
+			} else if (videos.length > 0) {
+				// 追加模式：只有当有数据时才追加
 				newResults[site_name].push(...videos);
 			}
 
 			// 更新searchResults，触发响应式更新
 			searchResults.value = newResults;
 
-			// 设置分页信息（内联setTabPagination功能）
-			if (pagination) {
-				if (!tabPagination.value[site_name]) {
-					tabPagination.value[site_name] = {};
-				}
-				tabPagination.value[site_name] = {
-					...tabPagination.value[site_name],
-					...pagination,
-					total_count: total_count,
-				};
-			} else if (!replace) {
-				// 只在非替换模式下计算本地分页信息
+			// 在非替换模式且没有分页信息时计算本地分页信息
+			if (!pagination && !replace) {
 				const totalCount = newResults[site_name].length;
 				const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
@@ -244,8 +263,8 @@ export const useSearchStore = defineStore("search", () => {
 				}
 			}
 
-			// 如果还没有活跃标签页，设置为第一个有结果的平台
-			if (!activeTab.value) {
+			// 如果还没有活跃标签页且有数据，设置为第一个有结果的平台
+			if (!activeTab.value && videos.length > 0) {
 				activeTab.value = site_name;
 			}
 
@@ -378,6 +397,8 @@ export const useSearchStore = defineStore("search", () => {
 		currentTabResults,
 		currentTabPagination,
 		currentTabStatistics,
+		currentPageHasData,
+		isCurrentPageEmpty,
 
 		// 动作
 		setSearchKeyword,
